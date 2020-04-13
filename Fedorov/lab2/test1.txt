@@ -1,0 +1,41 @@
+Ввод заканчивается при "qqq"
+
+a z
+a b 1.0
+a c 2.0
+a d 3.0
+c h 2.0
+c y 3.0
+h z 1.0
+y z 3.0
+qqq
+
+
+b e
+a b 1.0
+a c 2.0
+b d 7.0
+b e 8.0
+a g 2.0
+b g 6.0
+c e 4.0
+d e 4.0
+g e 1.0
+qqq
+
+
+a z
+a b 1.0
+a c 2.0
+b c 1.0
+b d 1.0
+c b 1.0
+c d 1.0
+qqq
+
+
+a f
+a b 2.0
+c d 4.0
+f e 3.0
+qqq
