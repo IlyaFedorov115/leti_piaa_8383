@@ -74,7 +74,7 @@ void Adjacencylist::addEdge(char start, char end, double weight_)
     EdgeList newList;
     if (adjList.find(start) == adjList.end())
         adjList[start] = newList;
-        //adjList.insert(std::pair <char, EdgeList>(firstNode, emptyVector));
+
     adjList[start].push_back(newEdge);
     countEdge++;
 }
@@ -85,6 +85,7 @@ class Dialog{
  private:
     Adjacencylist graph;
     std::map<char,char> resultPath;
+    double findDist(char start, char end);
     void reconstructPath(char,char);
     void toLower(std::string &str);
     void clear();
@@ -107,6 +108,15 @@ void Dialog::printInter(std::vector<char>& openSet, std::vector<char>& finishedS
     for (int i = 0; i <  finishedSet.size(); i++)
         std::cout << " " << finishedSet[i];
     std::cout << NORMAL << "\n";    
+}
+
+
+double Dialog::findDist(char start, char end){
+    for (int i = 0; i < graph.adjList[start].size(); i++){
+        if (graph.adjList[start][i].endVertex == end)
+            return graph.adjList[start][i].distant;
+    }
+    return -1.0;
 }
 
 
@@ -204,22 +214,20 @@ bool Dialog::algorithm_A_star(char start, char goal){
     fromStart[start] = 0;
     function[start] = fromStart[start] + heuristic(start, goal);
     char current; int tentative; char neighbour; int step = 0;
-    int resDistant = 0;
     while(openSet.size() != 0){
         current = min_F(openSet, function);                              // вершина из openset имеющая самую низкую оценку f(x)
         if (current == goal){                                            // достигли целевой вершины
-             std::cout << YELLOW << "Длина пути: " << UNDERLINE << resDistant << NORMAL << std::endl;
              return true;              //reconstructPath
         }
-        
+
         step++;
-        
+
         if (PRINT_INTEMEDIA){
             std::cout << LINE;
             std::cout << "\nШаг "<< step;
             printInter(openSet, finishedSet);
         }
-        
+
         auto it = remove(openSet.begin(), openSet.end(), current);
         openSet.erase(it);
         std::cout << GREEN << "Вершина "<< CYAN << current <<  GREEN << " просмотрена."<<NORMAL<<std::endl;
@@ -250,7 +258,6 @@ bool Dialog::algorithm_A_star(char start, char goal){
                   resultPath[neighbour] = current;                                // обновляем значения
                   fromStart[neighbour] = tentative;
                   function[neighbour] = fromStart[neighbour] + heuristic(neighbour, goal);
-                  resDistant += currEdge->distant;
                }
         }//for
 
@@ -263,16 +270,28 @@ bool Dialog::algorithm_A_star(char start, char goal){
 
 void Dialog::reconstructPath(char start, char goal){         //функция реконструкции пути
     std::vector<char> result;
-    char current = goal;                                     // Добавляем goal в результирующий путь
-    result.push_back(current);							     // (идем в обратном порядке)
-    while (current != start){								 // получаем вершину из которой пришли в текущую
-        current = resultPath[current];
-        result.push_back(current);
+    std::vector<double> resDist;
+    double resDistant = 0.0;
+    char currentG;
+    char currentS = goal;                                     // Добавляем goal в результирующий путь
+    result.push_back(currentS);							     // (идем в обратном порядке)
+    while (currentS != start){								 // получаем вершину из которой пришли в текущую
+        currentG = currentS;
+        currentS = resultPath[currentS];
+        result.push_back(currentS);
+        resDist.push_back(findDist(currentS, currentG));
     }
 
     std::reverse(result.begin(), result.end());              // т.к. конечная->..->начальная
+    std::reverse(resDist.begin(), resDist.end());
     std::cout << YELLOW << "Полученный путь: " << NORMAL;
-    std::cout << result << NORMAL << std::endl;
+    
+    for (int i = 0; i < result.size()-1; i++){
+        std::cout << result[i] << " --" << GREEN << resDist[i] << NORMAL << "--> ";
+        resDistant += resDist[i];
+    }
+    std::cout << result.back() << std::endl;
+    std::cout << YELLOW << "Длина пути: " << UNDERLINE << resDistant << NORMAL << std::endl;
 }
 
 
@@ -286,6 +305,4 @@ int main()
 
     return 0;
 }
-
-
 
