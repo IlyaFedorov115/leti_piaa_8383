@@ -42,6 +42,7 @@ class EdgeList{                  //"список ребер"
     int countEdge;              // количество ребер графа
   public:
     EdgeList();
+    double findDist(char start, char end);
     void addEdge(Edge*);              // методы добавления
     void addEdge(char, char, double); //ребра
 };
@@ -61,7 +62,13 @@ void EdgeList::addEdge(char start, char end, double weight_)
 }
 
 
-
+double EdgeList::findDist(char start, char end){
+    for (int i = 0; i < list.size(); i++){
+        if (list[i]->startVertex == start && list[i]->endVertex == end)
+            return list[i]->weight;
+    }
+    return -1.0;
+}
 
 void dialog(){
     EdgeList workList;
@@ -69,21 +76,21 @@ void dialog(){
     char globalEnd;
     char start, goal;
     double weight;
-    
+
     std::cout << GREEN << "Введите начальную и конечную вершины: " << NORMAL;
     while (!(std::cin >> globalStart >> globalEnd)){
         std::cout << RED << "Ошибка ввода. Попробуйте снова: " <<NORMAL;
     }
 
     std::cout << GREEN << "Введите ребра (конец ввода-"<< UNDERLINE << "qqq "<< NORMAL << GREEN <<"):" << NORMAL<<std::endl;
-    
+
     while(cin >> start >> goal >> weight){
         workList.addEdge(start,goal, weight);
         workList.countEdge++;
     }
 
 
-  
+
   char Current = globalStart;
   double currentMin; int index;
   vector<char> stack;                    //стек просмотренных вершин для возврата из тупика
@@ -95,25 +102,25 @@ void dialog(){
           index++;
           if (index == workList.countEdge) break;                  //тупик
       }
-      
+
       if (Current == globalEnd)  continue;
-      
+
       if (index >= workList.countEdge){            //т.к. тупик, "откатываем" назад
          if (stack.empty()){                  // если откатывать не куда, то пути нет
               std::cout << RED << "\nОшибка! Путь не найден!" << NORMAL << std::endl;
               return;
           }
-          
-          
-          
+
+
+
           Current = stack.back();
           stack.pop_back();
           continue;
       }
-      
-      
+
+
       currentMin = workList.list[index]->weight;
-      
+
       for (int i = index; i < workList.list.size(); i++)       //ищем смежные ребра
       {
           if (workList.list[i]->startVertex != Current || workList.list[i]->notTouch==false)
@@ -127,18 +134,24 @@ void dialog(){
                     }
            }
       }
-      
+
       stack.push_back(Current);
       Current = workList.list[index]->endVertex;
       workList.list[index]->notTouch = false;             //пометели как "просмотренную"
   }
-  
-  
-  std::cout << YELLOW << "Полученный путь: " << NORMAL;
-  for (int i = 0; i < stack.size(); i++){       //выводим результат
-      cout << stack[i] << "->";
-  }
+
+
+   std::cout << YELLOW << "Полученный путь: " << NORMAL;
+
+   double resDist = 0.0;
+   for (int i = 0; i < stack.size()-1; i++){
+       double dist = workList.findDist(stack[i],stack[i+1]);
+       resDist += dist;
+       cout << stack[i] << " --" << dist << "--> ";
+   }
    cout << globalEnd; 
+   cout << YELLOW << "\nДлина пути: " << UNDERLINE << resDist << NORMAL << endl;
+   
 }
 
 
@@ -149,4 +162,4 @@ int main()
     dialog();
 
     return 0;
-}
+} 
