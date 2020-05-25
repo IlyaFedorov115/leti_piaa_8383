@@ -338,6 +338,7 @@ ostream& operator<<(ostream &stream, const Map &obj)
 		stream << endl;
     }
 	stream << "\033[0m";
+	return stream;
 }
 
 // класс для диалога с пользователем, не относится к алгоритму
